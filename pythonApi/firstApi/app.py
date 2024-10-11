@@ -17,6 +17,16 @@ def root(): #Function for route
 def get_employees():
     return jsonify(employees)
 
+@app.route("/employee/<int:id>", methods=["GET"])
+def getEmployee_by_id(id: int):
+    employee = get_employee(id)
+    if employee is None:
+        return jsonify({"Error": "Employee does not exist"}), 400
+    return jsonify(employee)
+
+def get_employee(id):
+    return next((e for e in employees if e['id'] == id), None)
+
 def employee_is_valid(employee):
     for key in employee.keys():
         if key != 'name':
@@ -34,6 +44,26 @@ def create_employee():
     # nextEmployeeId += 1
     employees.append(employee)
     return { 'location': f'/employees/{employee["id"]}' }, 201
+
+@app.route("/employee/<int:id>", methods=["PUT"])
+def update_employee(id: int):
+    employee = get_employee(id)
+    if employee is None:
+        return jsonify({ 'error': 'Employee does not exist.' }), 404
+    updated_employee = json.loads(request.data)
+    if not employee_is_valid(updated_employee):
+        return jsonify({ 'error': 'Invalid employee properties.' }), 400
+    employee.update(updated_employee)
+    return jsonify(employee)
+
+@app.route("/employee/<int:id>", methods=["DELETE"])
+def delete_employee(id: int):
+    global employees
+    employee = get_employee(id)
+    if employee is None:
+        return({"Error": "Employee does not exist"}), 404
+    employees = [e for e in employees if e["id"] != id]
+    return jsonify(employee), 200
 
 # Run app
 if __name__ == "__main__":
