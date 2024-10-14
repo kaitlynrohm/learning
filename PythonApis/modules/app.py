@@ -1,11 +1,15 @@
 # To start server: python app.py
 # Imports
 from flask import Flask, jsonify
+from routes import init_api
 # modules import
-from PythonApis.Modules.controller import my_module
+from controller.my_module import greetings
 
 # Create app
 app = Flask(__name__)
+
+# Initialise app
+init_api(app)
 
 @app.route("/", methods=["GET"])
 def root():
@@ -13,9 +17,8 @@ def root():
 
 @app.route("/module")
 def module():
-    greeting = my_module.greetings("Kay")
+    greeting = greetings("Kay")
     return greeting
-
 
 # Run app
 if __name__ == "__main__":
